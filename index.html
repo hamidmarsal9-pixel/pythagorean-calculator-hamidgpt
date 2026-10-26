@@ -1,0 +1,650 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1120">
+  <title>HAMID RIGHT TRIANGLE SOLVER</title>
+
+  <style>
+    :root {
+      --bg: #0b1120;
+      --panel: #131e30;
+      --input: #0d1728;
+      --border: #2b3a50;
+      --blue: #38bdf8;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --green: #4ade80;
+      --red: #f87171;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px 14px 40px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      max-width: 680px;
+      margin: auto;
+    }
+
+    header {
+      text-align: center;
+      padding: 26px 8px;
+      margin-bottom: 22px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-size: 35px;
+      margin-bottom: 12px;
+      color: var(--blue);
+    }
+
+    h1 {
+      color: var(--blue);
+      font-size: clamp(23px, 5vw, 34px);
+      line-height: 1.25;
+      margin: 0;
+      letter-spacing: 0.5px;
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 0;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+
+    h2 {
+      font-size: 18px;
+      margin: 0 0 8px;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 0 0 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 15px 12px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 13px;
+      color: #cbd5e1;
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: 100%;
+      min-width: 0;
+      padding: 13px 10px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--input);
+      color: white;
+      font-size: 16px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 2px #38bdf822;
+    }
+
+    input::placeholder {
+      color: #64748b;
+    }
+
+    .field small {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 6px;
+    }
+
+    .status {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 16px 0 0;
+    }
+
+    .status.error {
+      color: var(--red);
+    }
+
+    .status.success {
+      color: var(--green);
+    }
+
+    .diagram-wrap {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      margin: 10px auto;
+    }
+
+    svg {
+      width: 100%;
+      max-width: 440px;
+      height: auto;
+      overflow: visible;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .result {
+      background: var(--input);
+      border: 1px solid var(--border);
+      padding: 13px;
+      border-radius: 10px;
+      min-width: 0;
+    }
+
+    .result span {
+      color: var(--muted);
+      font-size: 12px;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .result strong {
+      font-size: 19px;
+      color: var(--blue);
+      overflow-wrap: anywhere;
+    }
+
+    .steps {
+      font-size: 14px;
+      line-height: 1.9;
+      overflow-wrap: anywhere;
+    }
+
+    .steps p {
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    button {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 13px;
+      background: #1e293b;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+
+    button:hover {
+      border-color: var(--blue);
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 15px 0;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media (max-width: 360px) {
+      .card {
+        padding: 15px;
+      }
+
+      .grid {
+        gap: 12px 8px;
+      }
+
+      input {
+        padding: 11px 8px;
+      }
+
+      .result strong {
+        font-size: 17px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">△</div>
+      <h1>HAMID RIGHT TRIANGLE SOLVER</h1>
+      <p>Automatic Right Triangle Calculator</p>
+    </header>
+
+    <section class="card">
+      <h2>Triangle Inputs</h2>
+      <p class="hint">
+        Enter any two valid values. Other values will be calculated
+        automatically. Angles are in degrees.
+      </p>
+
+      <div class="grid">
+        <div class="field">
+          <label for="angleA">Angle A (°)</label>
+          <input id="angleA" type="number" min="0" max="90"
+                 step="any" placeholder="Angle A">
+          <small>0° &lt; A &lt; 90°</small>
+        </div>
+
+        <div class="field">
+          <label for="angleB">Angle B (°)</label>
+          <input id="angleB" type="number" min="0" max="90"
+                 step="any" placeholder="Angle B">
+          <small>A + B = 90°</small>
+        </div>
+
+        <div class="field">
+          <label for="sideA">Side a</label>
+          <input id="sideA" type="number" min="0"
+                 step="any" placeholder="Side a">
+          <small>Opposite angle A</small>
+        </div>
+
+        <div class="field">
+          <label for="sideB">Side b</label>
+          <input id="sideB" type="number" min="0"
+                 step="any" placeholder="Side b">
+          <small>Opposite angle B</small>
+        </div>
+
+        <div class="field" style="grid-column: 1 / -1">
+          <label for="sideC">Side c (Hypotenuse)</label>
+          <input id="sideC" type="number" min="0"
+                 step="any" placeholder="Hypotenuse">
+          <small>Longest side, opposite the 90° angle</small>
+        </div>
+      </div>
+
+      <p id="status" class="status" aria-live="polite">
+        Enter two values to begin.
+      </p>
+
+      <button id="resetButton" type="button">Reset Calculator</button>
+    </section>
+
+    <section class="card">
+      <h2>Triangle Diagram</h2>
+
+      <div class="diagram-wrap">
+        <svg id="diagram" viewBox="0 0 320 220"
+             role="img" aria-label="Right triangle diagram">
+          <path id="triangle" d="M 35 180 L 275 180 L 275 30 Z"
+                fill="#38bdf8" fill-opacity="0.08"
+                stroke="#38bdf8" stroke-width="2.5"
+                stroke-linejoin="round"/>
+
+          <path d="M 259 180 L 259 164 L 275 164"
+                fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+
+          <g fill="#f1f5f9" font-size="12">
+            <text x="20" y="195">A</text>
+            <text x="280" y="24">B</text>
+            <text x="281" y="195">C (90°)</text>
+            <text id="labelA" x="72" y="166">A</text>
+            <text id="labelB" x="281" y="95">B</text>
+            <text id="labela" x="282" y="110">a</text>
+            <text id="labelb" x="150" y="199">b</text>
+            <text id="labelc" x="145" y="92">c</text>
+          </g>
+        </svg>
+      </div>
+
+      <p class="hint">
+        The drawing is schematic and not guaranteed to be to scale.
+      </p>
+    </section>
+
+    <section id="resultsCard" class="card" hidden>
+      <h2>Calculated Results</h2>
+
+      <div class="result-grid">
+        <div class="result">
+          <span>Angle A</span>
+          <strong id="outAngleA">—</strong>
+        </div>
+
+        <div class="result">
+          <span>Angle B</span>
+          <strong id="outAngleB">—</strong>
+        </div>
+
+        <div class="result">
+          <span>Side a</span>
+          <strong id="outSideA">—</strong>
+        </div>
+
+        <div class="result">
+          <span>Side b</span>
+          <strong id="outSideB">—</strong>
+        </div>
+
+        <div class="result" style="grid-column: 1 / -1">
+          <span>Hypotenuse c</span>
+          <strong id="outSideC">—</strong>
+        </div>
+      </div>
+    </section>
+
+    <section id="stepsCard" class="card" hidden>
+      <h2>Calculation Steps</h2>
+      <div id="steps" class="steps"></div>
+    </section>
+
+    <footer>
+      HAMID RIGHT TRIANGLE SOLVER · Built for learning
+    </footer>
+  </div>
+
+  <script>
+    const fields = {
+      A: document.getElementById("angleA"),
+      B: document.getElementById("angleB"),
+      a: document.getElementById("sideA"),
+      b: document.getElementById("sideB"),
+      c: document.getElementById("sideC")
+    };
+
+    const statusEl = document.getElementById("status");
+    const resultsCard = document.getElementById("resultsCard");
+    const stepsCard = document.getElementById("stepsCard");
+    const stepsEl = document.getElementById("steps");
+
+    const rad = degrees => degrees * Math.PI / 180;
+    const deg = radians => radians * 180 / Math.PI;
+
+    function readInputs() {
+      const data = {};
+
+      for (const key of Object.keys(fields)) {
+        const raw = fields[key].value.trim();
+
+        if (raw === "") continue;
+
+        const value = Number(raw);
+
+        if (!Number.isFinite(value)) {
+          throw new Error("Please enter valid numbers.");
+        }
+
+        if (key === "A" || key === "B") {
+          if (value <= 0 || value >= 90) {
+            throw new Error("Angles must be greater than 0° and less than 90°.");
+          }
+        } else if (value <= 0) {
+          throw new Error("Side lengths must be greater than zero.");
+        }
+
+        data[key] = value;
+      }
+
+      return data;
+    }
+
+    function solve(d) {
+      const keys = Object.keys(d);
+
+      if (keys.length < 2) {
+        return null;
+      }
+
+      // Two angles
+      if (d.A !== undefined && d.B !== undefined) {
+        if (Math.abs(d.A + d.B - 90) > 0.01) {
+          throw new Error("Angles A and B must add up to 90°.");
+        }
+
+        // Two angles alone do not determine the triangle's size.
+        return null;
+      }
+
+      let A, B, a, b, c;
+
+      // Two sides
+      if (d.a && d.b) {
+        a = d.a;
+        b = d.b;
+        c = Math.hypot(a, b);
+        A = deg(Math.atan2(a, b));
+        B = 90 - A;
+      } else if (d.a && d.c) {
+        a = d.a;
+        c = d.c;
+
+        if (a >= c) {
+          throw new Error("Side c must be greater than side a.");
+        }
+
+        b = Math.sqrt((c - a) * (c + a));
+        A = deg(Math.asin(a / c));
+        B = 90 - A;
+      } else if (d.b && d.c) {
+        b = d.b;
+        c = d.c;
+
+        if (b >= c) {
+          throw new Error("Side c must be greater than side b.");
+        }
+
+        a = Math.sqrt((c - b) * (c + b));
+        B = deg(Math.asin(b / c));
+        A = 90 - B;
+      }
+
+      // One angle and one side
+      else if (d.A !== undefined || d.B !== undefined) {
+        A = d.A !== undefined ? d.A : 90 - d.B;
+        B = 90 - A;
+
+        const sine = Math.sin(rad(A));
+        const cosine = Math.cos(rad(A));
+
+        if (d.a) {
+          a = d.a;
+          c = a / sine;
+          b = c * cosine;
+        } else if (d.b) {
+          b = d.b;
+          c = b / cosine;
+          a = c * sine;
+        } else if (d.c) {
+          c = d.c;
+          a = c * sine;
+          b = c * cosine;
+        } else {
+          return null;
+        }
+      }
+
+      if (![A, B, a, b, c].every(Number.isFinite)) {
+        throw new Error("These inputs cannot produce a valid triangle.");
+      }
+
+      if (a <= 0 || b <= 0 || c <= 0) {
+        throw new Error("These inputs do not produce positive side lengths.");
+      }
+
+      return { A, B, a, b, c };
+    }
+
+    function fmt(value) {
+      return Number(value.toPrecision(10))
+        .toLocaleString("en-US", {
+          maximumFractionDigits: 6
+        });
+    }
+
+    function showResults(t) {
+      document.getElementById("outAngleA").textContent =
+        fmt(t.A) + "°";
+      document.getElementById("outAngleB").textContent =
+        fmt(t.B) + "°";
+      document.getElementById("outSideA").textContent = fmt(t.a);
+      document.getElementById("outSideB").textContent = fmt(t.b);
+      document.getElementById("outSideC").textContent = fmt(t.c);
+
+      // Fill the other fields automatically.
+      // The user's two original inputs remain unchanged.
+      for (const key of Object.keys(fields)) {
+        if (fields[key].value.trim() === "") {
+          fields[key].value = Number(t[key].toPrecision(10));
+        }
+      }
+
+      // Create calculation explanations safely as text.
+      const lines = [
+        `Angle A = ${fmt(t.A)}°`,
+        `Angle B = 90° − A = ${fmt(t.B)}°`,
+        `c = √(a² + b²) = ${fmt(t.c)}`,
+        `a = c × sin(A) = ${fmt(t.a)}`,
+        `b = c × cos(A) = ${fmt(t.b)}`
+      ];
+
+      stepsEl.replaceChildren();
+
+      for (const line of lines) {
+        const p = document.createElement("p");
+        p.textContent = line;
+        stepsEl.appendChild(p);
+      }
+
+      resultsCard.hidden = false;
+      stepsCard.hidden = false;
+      updateDiagram(t);
+
+      statusEl.textContent = "Triangle calculated successfully.";
+      statusEl.className = "status success";
+    }
+
+    function updateDiagram(t) {
+      // Scale sides to fit the diagram.
+      const maxSide = Math.max(t.a, t.b);
+      const scale = 210 / maxSide;
+      const width = t.b * scale;
+      const height = t.a * scale;
+
+      const left = 35;
+      const bottom = 180;
+      const right = left + width;
+      const top = bottom - height;
+
+      const x = n => Number(n.toFixed(2));
+
+      document.getElementById("triangle").setAttribute(
+        "d",
+        `M ${left} ${bottom} L ${x(right)} ${bottom} L ${x(right)} ${x(top)} Z`
+      );
+
+      document.getElementById("labelA").setAttribute("x", left + 10);
+      document.getElementById("labelA").setAttribute("y", bottom - 12);
+
+      document.getElementById("labelB").setAttribute("x", x(right) - 2);
+      document.getElementById("labelB").setAttribute("y", x(top) - 8);
+
+      document.getElementById("labela").setAttribute("x", x(right) + 5);
+      document.getElementById("labela").setAttribute("y", x((bottom + top) / 2));
+
+      document.getElementById("labelb").setAttribute("x", x((left + right) / 2));
+      document.getElementById("labelb").setAttribute("y", bottom + 17);
+
+      document.getElementById("labelc").setAttribute("x", x((left + right) / 2) - 8);
+      document.getElementById("labelc").setAttribute("y", x((bottom + top) / 2) - 8);
+    }
+
+    function clearCalculatedValues() {
+      for (const key of Object.keys(fields)) {
+        fields[key].value = "";
+      }
+
+      resultsCard.hidden = true;
+      stepsCard.hidden = true;
+
+      statusEl.textContent = "Enter two values to begin.";
+      statusEl.className = "status";
+
+      document.getElementById("triangle").setAttribute(
+        "d", "M 35 180 L 275 180 L 275 30 Z"
+      );
+    }
+
+    function calculate() {
+      try {
+        const data = readInputs();
+        const count = Object.keys(data).length;
+
+        if (count < 2) {
+          resultsCard.hidden = true;
+          stepsCard.hidden = true;
+          statusEl.textContent = "Enter at least two valid values.";
+          statusEl.className = "status";
+          return;
+        }
+
+        const triangle = solve(data);
+
+        if (!triangle) {
+          resultsCard.hidden = true;
+          stepsCard.hidden = true;
+          statusEl.textContent =
+            "Two angles alone are not enough. Enter at least one side length.";
+          statusEl.className = "status";
+          return;
+        }
+
+        showResults(triangle);
+      } catch (error) {
+        resultsCard.hidden = true;
+        stepsCard.hidden = true;
+        statusEl.textContent = error.message;
+        statusEl.className = "status error";
+      }
+    }
+
+    // Recalculate whenever the user changes an input.
+    for (const input of Object.values(fields)) {
+      input.addEventListener("input", calculate);
+    }
+
+    document.getElementById("resetButton").addEventListener(
+      "click", clearCalculatedValues
+    );
+  </script>
+</body>
+</html>
