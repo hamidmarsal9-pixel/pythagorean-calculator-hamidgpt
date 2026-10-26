@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b1120">
+<title>HAMID RIGHT TRIANGLE SOLVER</title>
+<style>
+:root{--bg:#0b1120;--panel:#131e30;--input:#0d1728;--border:#2b3a50;--blue:#38bdf8;--text:#f1f5f9;--muted:#94a3b8;--green:#4ade80;--red:#f87171}
+*{box-sizing:border-box}
+body{margin:0;padding:18px 12px 36px;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+.container{max-width:760px;margin:auto}
+header{text-align:center;padding:20px 8px;border-bottom:1px solid var(--border);margin-bottom:18px}
+.logo{font-size:34px;color:var(--blue);margin-bottom:8px}
+h1{color:var(--blue);font-size:clamp(22px,5vw,32px);line-height:1.25;margin:0}
+header p,.hint{color:var(--muted);font-size:13px;line-height:1.6}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:16px}
+h2{font-size:18px;margin:0 0 8px}
+.hint{margin:0 0 12px}
+.diagram-wrap{width:100%;overflow:hidden}
+svg{width:100%;height:auto;display:block;max-height:440px}
+.triangle{fill:#38bdf8;fill-opacity:.07;stroke:var(--blue);stroke-width:2.5;stroke-linejoin:round}
+.angle-arc{fill:none;stroke:#94a3b8;stroke-width:1.5}
+.label{fill:var(--text);font-size:12px}
+.slot rect{fill:var(--input);stroke:var(--border);stroke-width:1.2;rx:7}
+.slot text{fill:#cbd5e1;font-size:10px}
+.slot foreignObject{overflow:visible}
+.slot input{width:100%;height:100%;border:1px solid var(--border);border-radius:7px;background:var(--input);color:white;font:14px Arial,sans-serif;text-align:center;padding:4px;outline:none}
+.slot input:focus{border-color:var(--blue);box-shadow:0 0 0 2px #38bdf822}
+.slot input::placeholder{color:#64748b;font-size:11px}
+.status{font-size:13px;line-height:1.6;color:var(--muted);margin:12px 0 0}
+.status.error{color:var(--red)}.status.success{color:var(--green)}
+.result-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:14px}
+.result{background:var(--input);border:1px solid var(--border);padding:12px;border-radius:10px;min-width:0}
+.result span{color:var(--muted);font-size:12px;display:block;margin-bottom:7px}
+.result strong{font-size:18px;color:var(--blue);overflow-wrap:anywhere}
+.steps{font-size:13px;line-height:1.8;overflow-wrap:anywhere}.steps p{padding-bottom:8px;border-bottom:1px solid var(--border)}
+button{width:100%;border:1px solid var(--border);border-radius:9px;padding:12px;background:#1e293b;color:white;font-size:15px;cursor:pointer;margin-top:14px}
+button:hover{border-color:var(--blue)}footer{text-align:center;color:var(--muted);font-size:12px;padding:12px 0}
+[hidden]{display:none!important}
+@media(max-width:420px){body{padding:12px 8px 28px}.card{padding:12px}.label{font-size:11px}.slot input{font-size:12px}.result strong{font-size:16px}}
+</style>
+</head>
+<body>
+<div class="container">
+<header><div class="logo">△</div><h1>HAMID RIGHT TRIANGLE SOLVER</h1><p>Automatic Right Triangle Calculator</p></header>
+<section class="card">
+<h2>Triangle Solver</h2>
+<p class="hint">Masukkan nilai langsung pada kotak di gambar. Isi dua nilai yang cukup untuk menentukan segitiga; hasil lain akan muncul otomatis. C adalah sudut siku-siku (90°). Sisi a berhadapan dengan A, sisi b berhadapan dengan B, dan c adalah hipotenusa.</p>
+<div class="diagram-wrap">
+<svg viewBox="0 0 360 300" role="group" aria-label="Segitiga siku-siku dengan input sudut dan sisi">
+<!-- A at bottom-left, B at top-right, C at bottom-right -->
+<path id="triangle" class="triangle" d="M60 235 L300 235 L300 55 Z"/>
+<path id="rightAngle" class="angle-arc" d="M282 235 L282 217 L300 217"/>
+<path class="angle-arc" d="M60 215 L60 235 L80 235" opacity="0"/>
+<text class="label" x="43" y="250">A</text><text class="label" x="306" y="45">B</text><text class="label" x="306" y="251">C = 90°</text>
+<!-- angle A input -->
+<g class="slot">
+<rect x="72" y="181" width="72" height="36"/>
+<foreignObject x="74" y="183" width="68" height="32"><input id="angleA" type="number" min="0" max="90" step="any" placeholder="A (°)" aria-label="Sudut A dalam derajat"/></foreignObject>
+</g>
+<!-- angle B input -->
+<g class="slot">
+<rect x="220" y="67" width="72" height="36"/>
+<foreignObject x="222" y="69" width="68" height="32"><input id="angleB" type="number" min="0" max="90" step="any" placeholder="B (°)" aria-label="Sudut B dalam derajat"/></foreignObject>
+</g>
+<!-- side b bottom -->
+<g class="slot">
+<rect x="143" y="244" width="76" height="36"/>
+<foreignObject x="145" y="246" width="72" height="32"><input id="sideB" type="number" min="0" step="any" placeholder="Sisi b" aria-label="Sisi b"/></foreignObject>
+</g>
+<!-- side a vertical -->
+<g class="slot">
+<rect x="302" y="124" width="56" height="36"/>
+<foreignObject x="304" y="126" width="52" height="32"><input id="sideA" type="number" min="0" step="any" placeholder="Sisi a" aria-label="Sisi a"/></foreignObject>
+</g>
+<!-- hypotenuse c -->
+<g class="slot">
+<rect x="132" y="105" width="76" height="36"/>
+<foreignObject x="134" y="107" width="72" height="32"><input id="sideC" type="number" min="0" step="any" placeholder="Sisi c" aria-label="Sisi c"/></foreignObject>
+</g>
+</svg>
+</div>
+<p id="status" class="status" aria-live="polite">Isi dua nilai yang sesuai untuk memulai. Dua sudut saja belum cukup tanpa satu sisi.</p>
+<button id="resetButton" type="button">Reset Calculator</button>
+</section>
+<section id="resultsCard" class="card" hidden>
+<h2>Calculated Results</h2>
+<div class="result-grid">
+<div class="result"><span>Angle A</span><strong id="outAngleA">—</strong></div>
+<div class="result"><span>Angle B</span><strong id="outAngleB">—</strong></div>
+<div class="result"><span>Side a</span><strong id="outSideA">—</strong></div>
+<div class="result"><span>Side b</span><strong id="outSideB">—</strong></div>
+<div class="result" style="grid-column:1/-1"><span>Hypotenuse c</span><strong id="outSideC">—</strong></div>
+</div>
+</section>
+<section id="stepsCard" class="card" hidden><h2>Calculation Steps</h2><div id="steps" class="steps"></div></section>
+<footer>HAMID RIGHT TRIANGLE SOLVER · Built for learning</footer>
+</div>
+<script>
+const fields={A:document.getElementById("angleA"),B:document.getElementById("angleB"),a:document.getElementById("sideA"),b:document.getElementById("sideB"),c:document.getElementById("sideC")};
+const statusEl=document.getElementById("status"),resultsCard=document.getElementById("resultsCard"),stepsCard=document.getElementById("stepsCard"),stepsEl=document.getElementById("steps");
+const rad=d=>d*Math.PI/180,deg=r=>r*180/Math.PI;
+let lastEdited=null, busy=false; const derived=new Set();
+function readInputs(){const d={};for(const [k,el] of Object.entries(fields)){const raw=el.value.trim();if(raw==="")continue;const v=Number(raw);if(!Number.isFinite(v))throw Error("Masukkan angka yang valid.");if(k==="A"||k==="B"){if(v<=0||v>=90)throw Error("Sudut harus lebih dari 0° dan kurang dari 90°.");}else if(v<=0)throw Error("Panjang sisi harus lebih dari nol.");d[k]=v;}return d;}
+function solve(d){
+const has=(k)=>d[k]!==undefined;
+let A,B,a,b,c;
+if(has("A")&&has("B")){
+ if(Math.abs(d.A+d.B-90)>.01)throw Error("Sudut A dan B harus berjumlah 90°.");
+ A=d.A;B=d.B;
+ if(has("a")){a=d.a;c=a/Math.sin(rad(A));b=c*Math.cos(rad(A));}
+ else if(has("b")){b=d.b;c=b/Math.cos(rad(A));a=c*Math.sin(rad(A));}
+ else if(has("c")){c=d.c;a=c*Math.sin(rad(A));b=c*Math.cos(rad(A));}
+ else return null;
+}else if(has("a")&&has("b")){a=d.a;b=d.b;c=Math.hypot(a,b);A=deg(Math.atan2(a,b));B=90-A;}
+else if(has("a")&&has("c")){a=d.a;c=d.c;if(a>=c)throw Error("Sisi c harus lebih besar daripada sisi a.");b=Math.sqrt((c-a)*(c+a));A=deg(Math.asin(a/c));B=90-A;}
+else if(has("b")&&has("c")){b=d.b;c=d.c;if(b>=c)throw Error("Sisi c harus lebih besar daripada sisi b.");a=Math.sqrt((c-b)*(c+b));B=deg(Math.asin(b/c));A=90-B;}
+else if(has("A")||has("B")){
+ A=has("A")?d.A:90-d.B;B=90-A;
+ if(has("a")){a=d.a;c=a/Math.sin(rad(A));b=c*Math.cos(rad(A));}
+ else if(has("b")){b=d.b;c=b/Math.cos(rad(A));a=c*Math.sin(rad(A));}
+ else if(has("c")){c=d.c;a=c*Math.sin(rad(A));b=c*Math.cos(rad(A));}
+ else return null;
+}else return null;
+if(![A,B,a,b,c].every(Number.isFinite)||a<=0||b<=0||c<=0)throw Error("Input tidak membentuk segitiga siku-siku yang valid.");
+return {A,B,a,b,c};
+}
+function fmt(v){return Number(v.toPrecision(10)).toLocaleString("en-US",{maximumFractionDigits:6});}
+function showResults(t){
+for(const [key,el] of Object.entries(fields)){
+ if(el.value.trim()==="" || derived.has(key)){
+  el.value=Number(t[key].toPrecision(10));
+  derived.add(key);
+ }
+}
+document.getElementById("outAngleA").textContent=fmt(t.A)+"°";document.getElementById("outAngleB").textContent=fmt(t.B)+"°";
+document.getElementById("outSideA").textContent=fmt(t.a);document.getElementById("outSideB").textContent=fmt(t.b);document.getElementById("outSideC").textContent=fmt(t.c);
+const lines=[`A = ${fmt(t.A)}°`,`B = 90° − A = ${fmt(t.B)}°`,`c = √(a² + b²) = ${fmt(t.c)}`,`a = c × sin(A) = ${fmt(t.a)}`,`b = c × cos(A) = ${fmt(t.b)}`];
+stepsEl.replaceChildren();for(const line of lines){const p=document.createElement("p");p.textContent=line;stepsEl.appendChild(p);}
+resultsCard.hidden=false;stepsCard.hidden=false;updateDiagram(t);statusEl.textContent="Perhitungan berhasil. Nilai hasil ditampilkan di bagian hasil.";statusEl.className="status success";
+}
+function updateDiagram(t){
+const max=Math.max(t.a,t.b),scale=165/max,w=t.b*scale,h=t.a*scale,left=58,bottom=226,right=left+w,top=bottom-h;
+const x=n=>Number(n.toFixed(2));
+document.getElementById("triangle").setAttribute("d",`M ${left} ${bottom} L ${x(right)} ${bottom} L ${x(right)} ${x(top)} Z`);
+}
+function clearResults(){resultsCard.hidden=true;stepsCard.hidden=true;}
+function calculate(){
+if(busy)return;
+try{
+const d=readInputs(),count=Object.keys(d).length;
+if(count<2){clearResults();statusEl.textContent="Isi minimal dua nilai yang sesuai.";statusEl.className="status";return;}
+const t=solve(d);
+if(!t){clearResults();statusEl.textContent="Dua sudut saja tidak menentukan ukuran. Masukkan setidaknya satu panjang sisi.";statusEl.className="status";return;}
+showResults(t);
+}catch(e){clearResults();statusEl.textContent=e.message;statusEl.className="status error";}
+}
+for(const [key,input] of Object.entries(fields)){input.addEventListener("input",()=>{
+ lastEdited=key;
+ // Remove prior calculated values so only values typed by the user count as inputs.
+ for(const derivedKey of [...derived]){if(derivedKey!==key){fields[derivedKey].value="";derived.delete(derivedKey);}}
+ derived.delete(key);
+ calculate();
+});}
+document.getElementById("resetButton").addEventListener("click",()=>{busy=true;Object.values(fields).forEach(el=>el.value="");derived.clear();busy=false;clearResults();document.getElementById("triangle").setAttribute("d","M60 235 L300 235 L300 55 Z");statusEl.textContent="Isi dua nilai yang sesuai untuk memulai. Dua sudut saja belum cukup tanpa satu sisi.";statusEl.className="status";});
+</script>
+</body>
+</html>
